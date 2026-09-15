@@ -1,0 +1,26 @@
+# --- Artefacts de build Maven ---
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+# --- IDE ---
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
+# --- Systeme ---
+
+.DS_Store
+Thumbs.db
+# --- Logs et bases locales ---
+*.log
+data/
+# --- Secrets : JAMAIS dans Git ---
+.env
+*.pem
+*.key
+application-local.properties
