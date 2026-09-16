@@ -1,0 +1,55 @@
+name: CI
+# QUAND : a chaque push sur main et a chaque PR ciblant main
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Droits minimaux : ce workflow n'a besoin que de lire le code
+permissions:
+  contents: read
+
+# Si deux commits sont pousses coup sur coup sur la meme branche,
+# la premiere execution est annulee : on economise les minutes de CI
+# et on ne relit pas un resultat deja perime.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build & tests
+    runs-on: ubuntu-latest
+    steps:
+      # 1. Recuperer le code du depot sur le runner
+      - name: Recuperer le code
+        uses: actions/checkout@v7
+
+      # 2. Installer le JDK. "cache: maven" met en cache ~/.m2 :
+      #    la 2e execution est 3 a 4 fois plus rapide.
+      - name: Installer Java 25 (Temurin)
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # 3. Construire et tester.
+      #    -B : mode batch (pas de couleurs ni de barres de progression, logs lisibles)
+      #    verify : compile + tests + rapport JaCoCo
+      - name: Construire et tester
+        run: ./mvnw -B verify
+
+      # 4. Conserver les rapports meme si l'etape precedente a echoue.
+      #    "if: always()" est indispensable : sans lui, aucun rapport
+      #    n'est publie quand un test casse - c'est-a-dire quand on en a besoin.
+      - name: Publier les rapports de tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapports-tests
+          path: |
+            target/surefire-reports/
+            target/site/jacoco/
+          retention-days: 7
