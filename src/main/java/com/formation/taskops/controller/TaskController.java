@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Couche d'exposition HTTP. Elle ne contient AUCUNE regle metier :
@@ -68,5 +69,11 @@ public class TaskController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    /** GET /api/tasks/stats -> repartition des taches par statut */
+    @GetMapping("/stats")
+    public Map<TaskStatus, Long> stats() {
+        return service.countByStatus();
     }
 }
