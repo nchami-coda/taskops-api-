@@ -1,0 +1,12 @@
+# Chaque regle associe un motif de fichiers a des relecteurs OBLIGATOIRES.
+# La DERNIERE regle qui correspond l'emporte.
+
+# Par defaut, toute l'equipe
+* @nchami-coda
+
+# Le code metier exige une relecture d'un developpeur backend
+/src/main/java/ @nchami-coda
+
+# Les fichiers d'infrastructure et de CI seront critiques a partir du Module 3
+/.github/workflows/ @nchami-coda
+/pom.xml @nchami-coda
