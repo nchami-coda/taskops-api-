@@ -25,6 +25,15 @@
         <java.version>25</java.version>
         <!-- Encodage explicite : evite les surprises entre Windows, macOS et la CI Linux -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Coordonnees SonarQube Cloud -->
+        <sonar.organization>nchami-coda</sonar.organization>
+        <sonar.projectKey>nchami-coda_taskops-api</sonar.projectKey>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <!-- Indique a Sonar ou trouver le rapport de couverture produit par JaCoCo -->
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.build.directory}/site/jacoco/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencies>
