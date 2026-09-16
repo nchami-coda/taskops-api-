@@ -64,3 +64,4 @@ L'API écoute sur `http://localhost:8080`.
 
 3\. Ouvrir une Pull Request ; la fusion exige une revue et des tests verts.
 
+# test interdit
