@@ -1,0 +1,73 @@
+name: Release
+
+# QUAND : uniquement lors du push d'un tag commençant par "v"
+on:
+  push:
+    tags:
+      - 'v*'
+
+# Ce workflow doit CREER une release : il lui faut le droit d'ecriture.
+# On l'accorde ici, et nulle part ailleurs (principe du moindre privilege).
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Construire et publier la release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Recuperer le code
+        uses: actions/checkout@v7
+        with:
+           fetch-depth: 0       # historique complet : necessaire aux notes de version
+
+      - name: Installer Java 25 (Temurin)
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      # Le tag "v1.1.0" doit produire la version Maven "1.1.0" : on retire le "v".
+      # GITHUB_ENV rend la variable disponible dans les steps SUIVANTS.
+      - name: Deduire la version depuis le tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Version deduite : $VERSION"
+
+      # versions:set reecrit <version> dans le pom.
+      # -DgenerateBackupPoms=false : pas de pom.xml.versionsBackup parasite.
+      - name: Fixer la version dans le pom
+        run: ./mvnw -B versions:set -DnewVersion="${VERSION}" -DgenerateBackupPoms=false
+
+      # On RECONSTRUIT ET RETESTE : l'artefact publie doit etre issu
+      # d'un build complet et verifie, jamais d'un raccourci.
+      - name: Construire l'artefact
+        run: ./mvnw -B clean verify
+
+      - name: Verifier le contenu de l'artefact
+        run: |
+          ls -lh target/*.jar
+          # Le JAR embarque-t-il bien ses metadonnees de version ?
+          unzip -p "target/taskops-api-${VERSION}.jar" \
+            BOOT-INF/classes/META-INF/build-info.properties
+
+      # --generate-notes construit les notes a partir des PR fusionnees
+      # depuis la release precedente. C'est la recompense des Conventional Commits.
+      - name: Publier la release GitHub
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "target/taskops-api-${VERSION}.jar" \
+            --title "TaskOps API ${GITHUB_REF_NAME}" \
+            --generate-notes
+
+      - name: Conserver l'artefact comme artefact de workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: taskops-api-${{ env.VERSION }}
+          path: target/taskops-api-${{ env.VERSION }}.jar
+          retention-days: 30
