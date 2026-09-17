@@ -2,6 +2,7 @@ package com.formation.taskops.controller;
  
 import com.formation.taskops.model.Task; 
 import com.formation.taskops.model.TaskStatus; 
+import com.formation.taskops.service.CanaryService;
 import com.formation.taskops.service.TaskNotFoundException; 
 import com.formation.taskops.service.TaskService; 
 import org.junit.jupiter.api.DisplayName; 
@@ -45,6 +46,14 @@ class TaskControllerTest {
      */ 
     @MockitoBean 
     private TaskService service; 
+
+    /**
+     * TaskController depend aussi de CanaryService (etape 7 du Module 4).
+     * @WebMvcTest ne charge que la couche web : il faut donc mocker ce bean
+     * pour que Spring puisse construire TaskController.
+     */
+    @MockitoBean
+    private CanaryService canary;
  
     @Test 
     @DisplayName("GET /api/tasks renvoie 200 et la liste au format JSON") 
@@ -107,4 +116,4 @@ class TaskControllerTest {
                 .andExpect(status().isOk()) 
                 .andExpect(jsonPath("$").isEmpty()); 
     } 
-} 
+}
