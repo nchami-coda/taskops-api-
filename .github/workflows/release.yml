@@ -47,8 +47,7 @@ jobs:
       - name: Construire l'artefact
         run: ./mvnw -B clean verify
 
-      -
-              - name: Verifier le contenu de l'artefact
+      - name: Verifier le contenu de l'artefact
         run: |
           ls -lh target/*.jar
           unzip -l "target/taskops-api-${VERSION}.jar" | grep -i build-info || echo "AUCUN build-info trouve"
