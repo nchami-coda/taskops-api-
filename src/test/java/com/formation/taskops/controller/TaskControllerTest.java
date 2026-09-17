@@ -116,4 +116,19 @@ class TaskControllerTest {
                 .andExpect(status().isOk()) 
                 .andExpect(jsonPath("$").isEmpty()); 
     } 
+
+    @Test 
+    @DisplayName("GET /api/tasks/tri renvoie 200 et delegue au canari") 
+    void trier_renvoie200() throws Exception { 
+        Task tache = new Task("Trier", "Test canari"); 
+        tache.setId(1L); 
+        when(service.findAll()).thenReturn(List.of(tache)); 
+        when(canary.utiliserNouvelleVersion()).thenReturn(false); 
+        when(canary.getPourcentage()).thenReturn(0); 
+ 
+        mockMvc.perform(get("/api/tasks/tri")) 
+                .andExpect(status().isOk()) 
+                .andExpect(jsonPath("$.implementation").value("v1-tri-par-id")) 
+                .andExpect(jsonPath("$.canaryPourcentage").value(0)); 
+    } 
 }
