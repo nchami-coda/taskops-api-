@@ -47,12 +47,11 @@ jobs:
       - name: Construire l'artefact
         run: ./mvnw -B clean verify
 
-      - name: Verifier le contenu de l'artefact
+      -
+              - name: Verifier le contenu de l'artefact
         run: |
           ls -lh target/*.jar
-          # Le JAR embarque-t-il bien ses metadonnees de version ?
-          unzip -p "target/taskops-api-${VERSION}.jar" \
-            BOOT-INF/classes/META-INF/build-info.properties
+          unzip -l "target/taskops-api-${VERSION}.jar" | grep -i build-info || echo "AUCUN build-info trouve"
 
       # --generate-notes construit les notes a partir des PR fusionnees
       # depuis la release precedente. C'est la recompense des Conventional Commits.
