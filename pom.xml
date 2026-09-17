@@ -58,6 +58,14 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
+        <!-- Actuator : expose l'etat et les metadonnees de l'application.
+             Indispensable pour les smoke tests (ce module), les probes
+             Kubernetes (Module 7) et Prometheus (Module 8). -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Base de donnees H2, en memoire. Portee "runtime" : utile a l'execution,
              inutile a la compilation. Sera remplacee par PostgreSQL au Module 5. -->
         <dependency>
@@ -91,6 +99,17 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <!-- Genere META-INF/build-info.properties DANS le JAR :
+                         version, date de construction, artifactId.
+                         Actuator le lit et l'expose sur /actuator/info. -->
+                    <execution>
+                        <id>build-info</id>
+                        <goals>
+                            <goal>build-info</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- JaCoCo : instrumente le bytecode pour savoir quelles lignes
