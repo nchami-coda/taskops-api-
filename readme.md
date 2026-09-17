@@ -1,3 +1,5 @@
+![Build & tests](https://github.com/nchami-coda/taskops-api-/actions/workflows/ci.yml/badge.svg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nchami-coda_taskops-api&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=nchami-coda_taskops-api)
 \# TaskOps API
 
 API REST de gestion de tâches — projet fil rouge de la formation
