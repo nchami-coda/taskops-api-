@@ -1,0 +1,21 @@
+# Tout ce qui est reconstruit : ne JAMAIS l'envoyer au moteur Docker
+target/
+
+# Historique Git : lourd, inutile dans l'image, et il contient tout le passe
+.git/
+.github/
+
+# IDE et systeme
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Documentation et scripts non necessaires a l'execution
+docs/
+*.md
+
+# Secrets : ceinture et bretelles
+.env
+*.pem
+*.key
