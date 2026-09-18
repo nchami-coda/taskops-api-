@@ -1,0 +1,13 @@
+# ATTENTION : exemple pedagogique de ce qu'il NE FAUT PAS faire.
+FROM eclipse-temurin:25-jdk
+
+WORKDIR /app
+
+# On copie TOUT le contexte : sources, .git, target/, IDE...
+COPY . .
+
+# On compile DANS l'image finale : Maven et le JDK y resteront
+RUN ./mvnw clean package -DskipTests
+
+# On tourne en root, avec un chemin de JAR fige en dur
+CMD ["java", "-jar", "target/taskops-api-0.0.1-SNAPSHOT.jar"]
