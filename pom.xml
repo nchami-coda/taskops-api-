@@ -74,6 +74,14 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- Pilote PostgreSQL. Portee "runtime" : necessaire a l'execution,
+             pas a la compilation. H2 reste present pour les tests. -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- Boite a outils de test : JUnit 5 (Jupiter), AssertJ, Mockito, MockMvc.
              Portee "test" : jamais embarquee dans le livrable. -->
         <dependency>
