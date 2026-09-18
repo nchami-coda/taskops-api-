@@ -1,0 +1,69 @@
+services:
+
+  # ═══════════════════════════════════════════════════════
+  # Base de donnees PostgreSQL
+  # ═══════════════════════════════════════════════════════
+  db:
+    image: postgres:18-alpine
+    container_name: taskops-db
+    environment:
+      POSTGRES_DB: taskops
+      POSTGRES_USER: taskops
+      # ${VAR:?message} : Compose REFUSE de demarrer si la variable
+      # n'est pas definie. Bien mieux qu'un mot de passe par defaut
+      # qu'on oublie de changer en production.
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?definissez POSTGRES_PASSWORD dans .env}
+    volumes:
+      # Volume NOMME : les donnees survivent a la suppression du conteneur
+      # PostgreSQL 18+ attend le point de montage sur /var/lib/postgresql
+      # (le dossier parent), pas directement sur .../data comme dans les versions precedentes.
+      - donnees-postgres:/var/lib/postgresql
+    networks:
+      - taskops
+    # Le healthcheck rend le service "healthy" seulement quand
+    # PostgreSQL accepte reellement des connexions.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskops -d taskops"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    # On n'expose le port sur l'hote QUE pour le confort du developpement.
+    # En production, la base ne doit etre joignable que par le reseau interne.
+    ports:
+      - "5432:5432"
+
+  # ═══════════════════════════════════════════════════════
+  # Application TaskOps
+  # ═══════════════════════════════════════════════════════
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: taskops-api:${TAG:-local}
+    container_name: taskops-api
+    depends_on:
+      db:
+        # LA ligne qui evite 90 % des problemes de demarrage :
+        # on attend que db soit HEALTHY, pas seulement demarre.
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      # "db" est le NOM DU SERVICE : Compose le resout en adresse IP
+      # sur le reseau interne. Aucune IP en dur.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/taskops
+      SPRING_DATASOURCE_USERNAME: taskops
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    networks:
+      - taskops
+    restart: unless-stopped
+
+volumes:
+  donnees-postgres:
+
+networks:
+  taskops:
+    driver: bridge
