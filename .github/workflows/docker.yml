@@ -5,11 +5,9 @@ on:
     tags: ['v*']            # une image par release, comme le JAR du Module 4
   pull_request:
     branches: [main]        # sur les PR : on construit sans publier
-
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}       # ex : nchami-coda/taskops-api-
-
+  IMAGE_NAME: nchami-coda/taskops-api   # forcé en dur : github.repository se termine par "-" (faute de frappe historique du nom du depot), ce qui est un format d'image Docker invalide
 jobs:
   image:
     name: Construire et publier l'image
